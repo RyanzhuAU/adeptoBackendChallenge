@@ -1,6 +1,6 @@
 package com.adepto.codechallenger.controller;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.adepto.codechallenger.Constants;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -9,7 +9,11 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.web.context.WebApplicationContext;
+
+import java.io.File;
+
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 /**
  * Created by ryan.zhu on 24/03/2018.
@@ -19,13 +23,7 @@ import org.springframework.web.context.WebApplicationContext;
 @AutoConfigureMockMvc
 public class ScheduleControllerTest {
     @Autowired
-    private WebApplicationContext context;
-
-    @Autowired
     private MockMvc mockMvc;
-
-    @Autowired
-    private ObjectMapper objectMapper;
 
     @Before
     public void setup() throws Exception {
@@ -34,15 +32,22 @@ public class ScheduleControllerTest {
 
     @Test
     public void loadShiftTest() throws Exception {
-        //FIXME Fix this unit test for end point
-//        this.mockMvc.perform(get("/loadShift"))
-//                .andExpect(status().isOk());
+        File shiftFile = new File(Constants.SHIFT_FILE_NAME);
+        File staffFile = new File(Constants.STAFF_FILE_NAME);
+
+        if (shiftFile.exists() && staffFile.exists()) {
+            this.mockMvc.perform(get("/loadShift"))
+                    .andExpect(status().isOk());
+        }
+        else {
+            this.mockMvc.perform(get("/loadShift"))
+                    .andExpect(status().isBadRequest());
+        }
     }
 
     @Test
     public void generateShiftTest() throws Exception {
-        //FIXME Fix this unit test for end point
-//        this.mockMvc.perform(get("/generateShift"))
-//                .andExpect(status().isOk());
+        this.mockMvc.perform(get("/generateShift"))
+                .andExpect(status().isOk());
     }
 }

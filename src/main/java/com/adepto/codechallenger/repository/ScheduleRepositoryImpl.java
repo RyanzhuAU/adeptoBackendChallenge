@@ -31,13 +31,13 @@ public class ScheduleRepositoryImpl implements ScheduleRepositoryCustom {
         jdbcTemplate.execute(sql);
     }
 
-    public void saveShiftSchedule(Integer shiftId, Integer staffId){
-        String sql = "INSERT INTO shift_schedule\n" +
-                "(shift_id, staff_id)\n" +
-                "VALUES\n" +
-                "(" + shiftId + "," + staffId + ");";
-
-        jdbcTemplate.execute(sql);
-
-    }
+//    public void saveShiftSchedule(Integer shiftId, Integer staffId){
+//        String sql = "INSERT INTO shift_schedule\n" +
+//                "(shift_id, staff_id)\n" +
+//                "VALUES\n" +
+//                "(" + shiftId + "," + staffId + ");";
+//
+//        jdbcTemplate.execute(sql);
+//
+//    }
 }

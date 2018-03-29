@@ -12,6 +12,7 @@ import com.adepto.codechallenger.representation.StaffRep;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -33,7 +34,7 @@ public class ScheduleServiceImpl implements ScheduleService {
     @Autowired
     private ScheduleRepositoryImpl scheduleRepository;
 
-    public ScheduleServiceImpl(ShiftRepository shiftRepository) {
+    public ScheduleServiceImpl(ShiftRepository shiftRepository, StaffRepository staffRepository, ShiftScheduleRepository shiftScheduleRepository) {
         this.shiftRepository = shiftRepository;
     }
 
@@ -46,17 +47,26 @@ public class ScheduleServiceImpl implements ScheduleService {
      * @param staffFileName
      */
 
-    public void loadScheduleData(String shiftFileName, String staffFileName) {
-        logger.info("Truncate the shift and staff table");
+    public void loadScheduleData(String shiftFileName, String shiftTableName,
+                                 String staffFileName, String staffTableName) throws Exception {
+        try {
+            logger.info("Truncate the shift and staff table");
 
-        scheduleRepository.truncateTable(Constants.SHIFT_TABLE_NAME);
-        scheduleRepository.truncateTable(Constants.STAFF_TABLE_NAME);
+            scheduleRepository.truncateTable(shiftTableName);
+            scheduleRepository.truncateTable(staffTableName);
 
-        logger.info("Load shift and staff data from selected csv files - shift file: " + shiftFileName + " staff file: " + staffFileName);
-        scheduleRepository.loadDataFromCsv(shiftFileName, Constants.SHIFT_TABLE_NAME);
-        scheduleRepository.loadDataFromCsv(staffFileName, Constants.STAFF_TABLE_NAME);
+            logger.info("Load shift and staff data from selected csv files - shift file: " + shiftFileName + " staff file: " + staffFileName);
+            scheduleRepository.loadDataFromCsv(shiftFileName, shiftTableName);
+            scheduleRepository.loadDataFromCsv(staffFileName, staffTableName);
+        }
+        catch (DataAccessException de) {
+            throw new Exception(Constants.ERROR_LOAD_CSV_FILE);
+        }
     }
 
+    /**
+     *  Generate shift schedule based on the imported shift/staff data.
+     */
     public void generateShiftSchedule() {
         //Separate the load shift/staff data and generate schedule actions.
 //        this.loadScheduleData(Constants.SHIFT_FILE_NAME, Constants.STAFF_FILE_NAME);
@@ -78,10 +88,13 @@ public class ScheduleServiceImpl implements ScheduleService {
 
             for (Staff staff : staffList) {
                 if (staff.getValidRole().contains(shift.getRequiredRole()) && !staff.getDaysUnavailable().contains(shift.getDay()) &&
-                        staff.getMaxHours() >= shift.getHours() && staffMap.get(staff.getStaffId()) == null) {
-                    scheduleRepository.saveShiftSchedule(shift.getShiftId(), staff.getStaffId());
+                        staff.getMaxHours() >= shift.getHours() && staffMap.get(staff.getId()) == null) {
+                    ShiftSchedule shiftSchedule = new ShiftSchedule(shift, staff);
+                    shiftScheduleRepository.save(shiftSchedule);
 
-                    staffMap.put(staff.getStaffId(), staff);
+//                    scheduleRepository.saveShiftSchedule(shift.getShiftId(), staff.getStaffId());
+
+                    staffMap.put(staff.getId(), staff);
 
                     Integer availableHours = staff.getMaxHours() - shift.getHours();
                     StaffRep staffRep = new StaffRep(staff, availableHours);
@@ -100,7 +113,8 @@ public class ScheduleServiceImpl implements ScheduleService {
                     Staff s = staffRep.getStaff();
                     if (s.getValidRole().contains(shift.getRequiredRole()) && !s.getDaysUnavailable().contains(shift.getDay())
                             && staffRep.getAvailableHours() >= shift.getHours()) {
-                        scheduleRepository.saveShiftSchedule(shift.getShiftId(), s.getStaffId());
+                        ShiftSchedule shiftSchedule = new ShiftSchedule(shift, s);
+                        shiftScheduleRepository.save(shiftSchedule);
 
                         staffRep.updateAvailableHours(shift.getHours());
 

@@ -5,7 +5,7 @@ package com.adepto.codechallenger.service;
  */
 public interface ScheduleService {
 
-    void loadScheduleData(String shiftFileName, String staffFileName);
+    void loadScheduleData(String shiftFileName, String shiftTableName, String staffFileName, String staffTableName) throws Exception;
 
     void generateShiftSchedule();
 }

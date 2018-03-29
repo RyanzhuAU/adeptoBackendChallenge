@@ -15,4 +15,6 @@ public class Constants {
     public final static String SHIFT_TABLE_NAME = "shift";
 
     public final static String SCHEDULE_TABLE_NAME = "shift_schedule";
+
+    public final static String ERROR_LOAD_CSV_FILE = "Cannot load csv file correctly.";
 }

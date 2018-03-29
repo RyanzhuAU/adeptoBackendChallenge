@@ -13,8 +13,10 @@ import java.util.List;
  */
 
 @Repository
-public interface ShiftScheduleRepository extends CrudRepository<Shift, String> {
+public interface ShiftScheduleRepository extends CrudRepository<ShiftSchedule, String> {
 
     ShiftSchedule save(ShiftSchedule shiftSchedule);
+
+    List<ShiftSchedule> findAll();
 
 }

@@ -2,10 +2,7 @@ package com.adepto.codechallenger.domain;
 
 import lombok.Data;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import javax.persistence.*;
 
 /**
  * Created by ryan.zhu on 24/03/2018.
@@ -15,8 +12,9 @@ import javax.persistence.Table;
 @Table(name = "shift")
 public class Shift {
     @Id
+    @GeneratedValue(strategy=GenerationType.AUTO)
     @Column(name="shift_id")
-    private Integer shiftId;
+    private Integer id;
 
     private String day;
 

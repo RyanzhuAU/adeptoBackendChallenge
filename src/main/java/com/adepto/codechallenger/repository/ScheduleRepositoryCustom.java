@@ -10,6 +10,6 @@ public interface ScheduleRepositoryCustom {
 
     void truncateTable(String tableName);
 
-    void saveShiftSchedule(Integer shiftId, Integer staffId);
+//    void saveShiftSchedule(Integer shiftId, Integer staffId);
 
 }
